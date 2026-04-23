@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>QR Kartvizit Oluşturucu</title>
+
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 
   <style>
@@ -25,7 +26,7 @@
     input {
       width: 100%;
       padding: 10px;
-      margin: 5px 0;
+      margin: 6px 0;
       border: 1px solid #ccc;
       border-radius: 6px;
     }
@@ -63,6 +64,8 @@
   <input id="website" placeholder="Web Site">
   <input id="instagram" placeholder="Instagram (örn: @epagroup)">
 
+  <input type="file" id="logoUpload" accept="image/*">
+
   <button onclick="generateQR()">QR Oluştur</button>
 
   <canvas id="qrcode"></canvas>
@@ -79,7 +82,6 @@ function generateQR() {
   const website = document.getElementById("website").value;
   const instagram = document.getElementById("instagram").value;
 
-  // 📌 vCard formatı (telefonlar bunu tanır)
   const vCard =
 `BEGIN:VCARD
 VERSION:3.0
@@ -95,7 +97,35 @@ END:VCARD`;
 
   QRCode.toCanvas(canvas, vCard, {
     width: 220,
-    margin: 2
+    margin: 2,
+    errorCorrectionLevel: "H"
+  }, function (error) {
+
+    if (error) console.error(error);
+
+    const file = document.getElementById("logoUpload").files[0];
+
+    if (file) {
+      const ctx = canvas.getContext("2d");
+      const img = new Image();
+
+      img.onload = function () {
+
+        const logoSize = 55;
+
+        const x = (canvas.width - logoSize) / 2;
+        const y = (canvas.height - logoSize) / 2;
+
+        // beyaz arka plan
+        ctx.fillStyle = "white";
+        ctx.fillRect(x, y, logoSize, logoSize);
+
+        ctx.drawImage(img, x, y, logoSize, logoSize);
+      };
+
+      img.src = URL.createObjectURL(file);
+    }
+
   });
 }
 </script>
