@@ -2,32 +2,36 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>QR Kod Oluşturucu</title>
+  <title>QR Kartvizit Oluşturucu</title>
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
+      font-family: Arial;
+      background: #f3f6f9;
       text-align: center;
-      padding: 50px;
+      padding: 30px;
     }
+
     .box {
       background: white;
-      padding: 30px;
-      border-radius: 12px;
-      max-width: 400px;
+      max-width: 500px;
       margin: auto;
+      padding: 20px;
+      border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
+
     input {
       width: 100%;
       padding: 10px;
-      margin-top: 10px;
-      border-radius: 6px;
+      margin: 5px 0;
       border: 1px solid #ccc;
+      border-radius: 6px;
     }
+
     button {
-      margin-top: 15px;
+      margin-top: 10px;
       padding: 10px 15px;
       border: none;
       border-radius: 6px;
@@ -35,42 +39,65 @@
       color: white;
       cursor: pointer;
     }
+
     button:hover {
       background: #0056b3;
     }
+
     canvas {
       margin-top: 20px;
     }
   </style>
 </head>
+
 <body>
 
 <div class="box">
-  <h2>QR Kod Oluşturucu</h2>
-  <input type="text" id="text" placeholder="Link veya yazı gir">
+
+  <h2>📇 QR Kartvizit Oluşturucu</h2>
+
+  <input id="name" placeholder="Ad Soyad">
+  <input id="company" placeholder="Şirket">
+  <input id="phone" placeholder="Telefon">
+  <input id="email" placeholder="E-posta">
+  <input id="website" placeholder="Web Site">
+  <input id="instagram" placeholder="Instagram (örn: @epagroup)">
+
   <button onclick="generateQR()">QR Oluştur</button>
-  <button onclick="downloadQR()">İndir</button>
-  <br>
+
   <canvas id="qrcode"></canvas>
+
 </div>
 
 <script>
-  function generateQR() {
-    const text = document.getElementById("text").value;
-    const canvas = document.getElementById("qrcode");
+function generateQR() {
 
-    QRCode.toCanvas(canvas, text, { width: 200 }, function (error) {
-      if (error) console.error(error);
-    });
-  }
+  const name = document.getElementById("name").value;
+  const company = document.getElementById("company").value;
+  const phone = document.getElementById("phone").value;
+  const email = document.getElementById("email").value;
+  const website = document.getElementById("website").value;
+  const instagram = document.getElementById("instagram").value;
 
-  function downloadQR() {
-    const canvas = document.getElementById("qrcode");
-    const link = document.createElement("a");
-    link.download = "qr.png";
-    link.href = canvas.toDataURL();
-    link.click();
-  }
+  // 📌 vCard formatı (telefonlar bunu tanır)
+  const vCard =
+`BEGIN:VCARD
+VERSION:3.0
+FN:${name}
+ORG:${company}
+TEL:${phone}
+EMAIL:${email}
+URL:${website}
+NOTE:Instagram ${instagram}
+END:VCARD`;
+
+  const canvas = document.getElementById("qrcode");
+
+  QRCode.toCanvas(canvas, vCard, {
+    width: 220,
+    margin: 2
+  });
+}
 </script>
 
 </body>
