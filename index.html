@@ -1,1 +1,77 @@
-<h1>Site çalışıyor 🎉</h1>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Kod Oluşturucu</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      text-align: center;
+      padding: 50px;
+    }
+    .box {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    canvas {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>QR Kod Oluşturucu</h2>
+  <input type="text" id="text" placeholder="Link veya yazı gir">
+  <button onclick="generateQR()">QR Oluştur</button>
+  <button onclick="downloadQR()">İndir</button>
+  <br>
+  <canvas id="qrcode"></canvas>
+</div>
+
+<script>
+  function generateQR() {
+    const text = document.getElementById("text").value;
+    const canvas = document.getElementById("qrcode");
+
+    QRCode.toCanvas(canvas, text, { width: 200 }, function (error) {
+      if (error) console.error(error);
+    });
+  }
+
+  function downloadQR() {
+    const canvas = document.getElementById("qrcode");
+    const link = document.createElement("a");
+    link.download = "qr.png";
+    link.href = canvas.toDataURL();
+    link.click();
+  }
+</script>
+
+</body>
+</html>
