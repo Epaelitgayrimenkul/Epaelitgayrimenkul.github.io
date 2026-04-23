@@ -25,9 +25,10 @@ body {
   margin-top: 15px;
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  text-align: left;
 }
 
-input, textarea {
+input {
   width: 100%;
   padding: 8px;
   margin: 5px 0;
@@ -48,6 +49,7 @@ button:hover {
 
 .qr {
   margin-top: 10px;
+  text-align: center;
 }
 </style>
 </head>
@@ -120,13 +122,18 @@ function render() {
     const div = document.createElement("div");
     div.className = "card";
 
+    // ✅ DÜZELTİLMİŞ SIRALAMA (FİRMA ÜSTTE)
     div.innerHTML = `
-      <h3>${card.name}</h3>
-      <p>${card.company}</p>
-      <p>${card.phone}</p>
-      <p>${card.email}</p>
+      <div>
+        <h3>🏢 ${card.company}</h3>
+        <p>👤 ${card.name}</p>
+        <p>📞 ${card.phone}</p>
+        <p>📧 ${card.email}</p>
+      </div>
 
-      <canvas id="qr-${card.id}"></canvas>
+      <div class="qr">
+        <canvas id="qr-${card.id}"></canvas>
+      </div>
     `;
 
     list.appendChild(div);
