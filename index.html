@@ -1,74 +1,90 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>QR Kartvizit Oluşturucu</title>
+<meta charset="UTF-8">
+<title>İşletme QR Kod Oluşturucu</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 
-  <style>
-    body {
-      font-family: Arial;
-      background: #f3f6f9;
-      text-align: center;
-      padding: 30px;
-    }
+<style>
+body {
+  font-family: Arial;
+  background: #eef2f7;
+  text-align: center;
+  padding: 30px;
+}
 
-    .box {
-      background: white;
-      max-width: 500px;
-      margin: auto;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
+.box {
+  background: #fff;
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
 
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 6px 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
+h2 {
+  margin-bottom: 15px;
+}
 
-    button {
-      margin-top: 10px;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 6px;
-      background: #007bff;
-      color: white;
-      cursor: pointer;
-    }
+input, textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
 
-    button:hover {
-      background: #0056b3;
-    }
+textarea {
+  resize: none;
+  height: 60px;
+}
 
-    canvas {
-      margin-top: 20px;
-    }
-  </style>
+button {
+  margin-top: 10px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  background: #0d6efd;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #084cdf;
+}
+
+canvas {
+  margin-top: 20px;
+}
+</style>
 </head>
 
 <body>
 
 <div class="box">
 
-  <h2>📇 QR Kartvizit Oluşturucu</h2>
+<h2>🏢 İşletme QR Kod Oluşturucu</h2>
 
-  <input id="name" placeholder="Ad Soyad">
-  <input id="company" placeholder="Şirket">
-  <input id="phone" placeholder="Telefon">
-  <input id="email" placeholder="E-posta">
-  <input id="website" placeholder="Web Site">
-  <input id="instagram" placeholder="Instagram (örn: @epagroup)">
+<input id="name" placeholder="Yetkili Ad Soyad">
+<input id="company" placeholder="Firma Adı">
+<input id="title" placeholder="Unvan (Örn: Gayrimenkul Danışmanı)">
+<input id="phone" placeholder="Telefon">
+<input id="email" placeholder="E-posta">
+<input id="website" placeholder="Web Sitesi">
 
-  <input type="file" id="logoUpload" accept="image/*">
+<input id="address" placeholder="Adres">
 
-  <button onclick="generateQR()">QR Oluştur</button>
+<input id="instagram" placeholder="Instagram">
+<input id="facebook" placeholder="Facebook (opsiyonel)">
 
-  <canvas id="qrcode"></canvas>
+<textarea id="note" placeholder="Hakkında / Açıklama"></textarea>
+
+<input type="file" id="logoUpload" accept="image/*">
+
+<button onclick="generateQR()">QR Oluştur</button>
+
+<canvas id="qrcode"></canvas>
 
 </div>
 
@@ -77,31 +93,40 @@ function generateQR() {
 
   const name = document.getElementById("name").value;
   const company = document.getElementById("company").value;
+  const title = document.getElementById("title").value;
   const phone = document.getElementById("phone").value;
   const email = document.getElementById("email").value;
   const website = document.getElementById("website").value;
+  const address = document.getElementById("address").value;
   const instagram = document.getElementById("instagram").value;
+  const facebook = document.getElementById("facebook").value;
+  const note = document.getElementById("note").value;
 
+  // 📌 Gelişmiş vCard (işletme profili)
   const vCard =
 `BEGIN:VCARD
 VERSION:3.0
 FN:${name}
 ORG:${company}
+TITLE:${title}
 TEL:${phone}
 EMAIL:${email}
 URL:${website}
-NOTE:Instagram ${instagram}
+ADR:;;${address};;;;
+NOTE:${note}
+X-SOCIALPROFILE;type=instagram:${instagram}
+X-SOCIALPROFILE;type=facebook:${facebook}
 END:VCARD`;
 
   const canvas = document.getElementById("qrcode");
 
   QRCode.toCanvas(canvas, vCard, {
-    width: 220,
+    width: 260,
     margin: 2,
     errorCorrectionLevel: "H"
-  }, function (error) {
+  }, function (err) {
 
-    if (error) console.error(error);
+    if (err) console.error(err);
 
     const file = document.getElementById("logoUpload").files[0];
 
@@ -111,16 +136,16 @@ END:VCARD`;
 
       img.onload = function () {
 
-        const logoSize = 55;
+        const size = 60;
 
-        const x = (canvas.width - logoSize) / 2;
-        const y = (canvas.height - logoSize) / 2;
+        const x = (canvas.width - size) / 2;
+        const y = (canvas.height - size) / 2;
 
         // beyaz arka plan
         ctx.fillStyle = "white";
-        ctx.fillRect(x, y, logoSize, logoSize);
+        ctx.fillRect(x, y, size, size);
 
-        ctx.drawImage(img, x, y, logoSize, logoSize);
+        ctx.drawImage(img, x, y, size, size);
       };
 
       img.src = URL.createObjectURL(file);
