@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>İşletme QR Kod Oluşturucu</title>
+<title>QR Kartvizit SaaS (Mini)</title>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 
@@ -10,149 +10,139 @@
 body {
   font-family: Arial;
   background: #eef2f7;
-  text-align: center;
-  padding: 30px;
-}
-
-.box {
-  background: #fff;
-  max-width: 600px;
-  margin: auto;
   padding: 20px;
-  border-radius: 14px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  text-align: center;
 }
 
-h2 {
-  margin-bottom: 15px;
+.container {
+  max-width: 800px;
+  margin: auto;
+}
+
+.card {
+  background: white;
+  padding: 15px;
+  margin-top: 15px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 input, textarea {
   width: 100%;
-  padding: 10px;
-  margin: 6px 0;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-textarea {
-  resize: none;
-  height: 60px;
+  padding: 8px;
+  margin: 5px 0;
 }
 
 button {
-  margin-top: 10px;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 6px;
+  padding: 10px;
   background: #0d6efd;
   color: white;
+  border: none;
   cursor: pointer;
+  margin-top: 5px;
 }
 
 button:hover {
   background: #084cdf;
 }
 
-canvas {
-  margin-top: 20px;
+.qr {
+  margin-top: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
+<div class="container">
 
-<h2>🏢 İşletme QR Kod Oluşturucu</h2>
+<h2>📇 QR Kartvizit SaaS (GitHub Edition)</h2>
 
-<input id="name" placeholder="Yetkili Ad Soyad">
-<input id="company" placeholder="Firma Adı">
-<input id="title" placeholder="Unvan (Örn: Gayrimenkul Danışmanı)">
+<div class="card">
+
+<input id="name" placeholder="Ad Soyad">
+<input id="company" placeholder="Firma">
 <input id="phone" placeholder="Telefon">
 <input id="email" placeholder="E-posta">
-<input id="website" placeholder="Web Sitesi">
-
-<input id="address" placeholder="Adres">
-
+<input id="website" placeholder="Website">
 <input id="instagram" placeholder="Instagram">
-<input id="facebook" placeholder="Facebook (opsiyonel)">
 
-<textarea id="note" placeholder="Hakkında / Açıklama"></textarea>
+<button onclick="saveCard()">Kart Kaydet</button>
 
-<input type="file" id="logoUpload" accept="image/*">
+</div>
 
-<button onclick="generateQR()">QR Oluştur</button>
-
-<canvas id="qrcode"></canvas>
+<h3>📁 Kayıtlı Kartlar</h3>
+<div id="list"></div>
 
 </div>
 
 <script>
-function generateQR() {
 
-  const name = document.getElementById("name").value;
-  const company = document.getElementById("company").value;
-  const title = document.getElementById("title").value;
-  const phone = document.getElementById("phone").value;
-  const email = document.getElementById("email").value;
-  const website = document.getElementById("website").value;
-  const address = document.getElementById("address").value;
-  const instagram = document.getElementById("instagram").value;
-  const facebook = document.getElementById("facebook").value;
-  const note = document.getElementById("note").value;
+let cards = JSON.parse(localStorage.getItem("cards") || "[]");
 
-  // 📌 Gelişmiş vCard (işletme profili)
-  const vCard =
-`BEGIN:VCARD
+function saveCard() {
+
+  const card = {
+    id: Date.now(),
+    name: name.value,
+    company: company.value,
+    phone: phone.value,
+    email: email.value,
+    website: website.value,
+    instagram: instagram.value
+  };
+
+  cards.push(card);
+  localStorage.setItem("cards", JSON.stringify(cards));
+
+  render();
+}
+
+function generateVCARD(c) {
+  return `BEGIN:VCARD
 VERSION:3.0
-FN:${name}
-ORG:${company}
-TITLE:${title}
-TEL:${phone}
-EMAIL:${email}
-URL:${website}
-ADR:;;${address};;;;
-NOTE:${note}
-X-SOCIALPROFILE;type=instagram:${instagram}
-X-SOCIALPROFILE;type=facebook:${facebook}
+FN:${c.name}
+ORG:${c.company}
+TEL:${c.phone}
+EMAIL:${c.email}
+URL:${c.website}
+NOTE:${c.instagram}
 END:VCARD`;
+}
 
-  const canvas = document.getElementById("qrcode");
+function render() {
 
-  QRCode.toCanvas(canvas, vCard, {
-    width: 260,
-    margin: 2,
-    errorCorrectionLevel: "H"
-  }, function (err) {
+  const list = document.getElementById("list");
+  list.innerHTML = "";
 
-    if (err) console.error(err);
+  cards.forEach(card => {
 
-    const file = document.getElementById("logoUpload").files[0];
+    const div = document.createElement("div");
+    div.className = "card";
 
-    if (file) {
-      const ctx = canvas.getContext("2d");
-      const img = new Image();
+    div.innerHTML = `
+      <h3>${card.name}</h3>
+      <p>${card.company}</p>
+      <p>${card.phone}</p>
+      <p>${card.email}</p>
 
-      img.onload = function () {
+      <canvas id="qr-${card.id}"></canvas>
+    `;
 
-        const size = 60;
+    list.appendChild(div);
 
-        const x = (canvas.width - size) / 2;
-        const y = (canvas.height - size) / 2;
+    const canvas = document.getElementById("qr-" + card.id);
 
-        // beyaz arka plan
-        ctx.fillStyle = "white";
-        ctx.fillRect(x, y, size, size);
-
-        ctx.drawImage(img, x, y, size, size);
-      };
-
-      img.src = URL.createObjectURL(file);
-    }
+    QRCode.toCanvas(canvas, generateVCARD(card), {
+      width: 180,
+      errorCorrectionLevel: "H"
+    });
 
   });
 }
+
+render();
+
 </script>
 
 </body>
